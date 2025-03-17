@@ -5,3 +5,4 @@ Pillow
 python-dotenv
 google-generativeai
 opencv-python
+gunicorn
