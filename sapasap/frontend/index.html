@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Cancer Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="flex items-center justify-center h-screen bg-no-repeat bg-center bg-gray-900"
+      style="background-image: url('/static/nurse_logo.png'); background-size: contain;">
+    <div class="w-full max-w-3xl p-6 bg-white shadow-lg rounded-lg text-center">
+        <h2 class="text-2xl font-bold text-gray-800">Skin Cancer Detection</h2>
+        <p class="text-gray-600 mb-4">Upload an image to detect the type of skin cancer.</p>
+
+    
+        <form id="uploadForm" enctype="multipart/form-data" class="mt-4">
+            <label for="fileInput" id="dropArea" class="block w-full p-10 border-2 border-dashed border-blue-500 rounded-lg bg-blue-100 text-blue-600 cursor-pointer flex flex-col items-center relative">
+                <img id="previewImage" class="hidden w-20 h-20 rounded-lg mb-2" />
+                <img id="uploadIcon" src="https://cdn-icons-png.flaticon.com/512/724/724933.png" alt="Upload Icon" class="w-12 h-12 mb-2">
+                <span id="uploadText" class="font-semibold">Choose Files</span>
+                <input type="file" id="fileInput" name="image" accept="image/*" class="hidden">
+                <p class="text-sm text-gray-600">or drop files here</p>
+            </label>
+            <button type="submit" class="mt-4 bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600">Upload</button>
+        </form>
+
+     
+        <div id="result" class="mt-4 text-gray-700"></div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const dropArea = document.getElementById('dropArea');
+        const previewImage = document.getElementById('previewImage');
+        const uploadIcon = document.getElementById('uploadIcon');
+        const uploadText = document.getElementById('uploadText');
+
+        // Show preview when image is selected
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.classList.remove('hidden');
+                    uploadIcon.classList.add('hidden');
+                    uploadText.textContent = file.name;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+ 
+        dropArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            dropArea.classList.add('bg-blue-200');
+        });
+
+        dropArea.addEventListener('dragleave', function() {
+            dropArea.classList.remove('bg-blue-200');
+        });
+
+        dropArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            dropArea.classList.remove('bg-blue-200');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                fileInput.files = e.dataTransfer.files;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.classList.remove('hidden');
+                    uploadIcon.classList.add('hidden');
+                    uploadText.textContent = file.name;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let formData = new FormData();
+            let file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please select an image first!");
+                return;
+            }
+
+            formData.append("image", file);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('result').innerHTML = `<p class="text-red-500 font-semibold">Error: ${data.error}</p>`;
+                } else {
+                    document.getElementById('result').innerHTML = `
+                        <p><strong>Prediction:</strong> ${data.prediction}</p>
+                        <p><strong>Confidence:</strong> ${(data.confidence * 100).toFixed(2)}%</p>
+                        <p><strong>Details:</strong> ${data.ai_generated_info}</p>
+                    `;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
