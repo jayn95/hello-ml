@@ -1,9 +1,6 @@
-from flask import Flask
-from flask import render_template
-from flask import request
-from flask import jsonify
+from flask import Flask, render_template, request, jsonify
 import os
-from utils import load_model, predict
+from .utils import load_model, predict  # Updated import
 
 app = Flask(__name__)
 
