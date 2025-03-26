@@ -2,6 +2,9 @@
 
 This project is a Flask-based web application that utilizes a TensorFlow Lite model to classify skin cancer types from uploaded images. It also provides detailed information about the classified type using Google GenAI. The application is designed to be simple, user-friendly, and visually appealing, making it suitable for medical professionals and researchers.
 
+Access Online for Demo: https://skin-cancer-classifier-m1pd.onrender.com
+
+
 ---
 
 ## Features
