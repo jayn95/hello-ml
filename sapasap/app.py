@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 TEMPLATE_DIR = os.path.join(BASE_DIR, "frontend")
 LABELS_FILE = os.path.join(BASE_DIR, "models/labels.json")
-MODEL_PATH = os.path.join(BASE_DIR, "models", "model.tflite")
+MODEL_PATH = os.path.join(BASE_DIR, "models", "model_unquant.tflite")
 
 app = Flask(__name__, template_folder=TEMPLATE_DIR)
 
