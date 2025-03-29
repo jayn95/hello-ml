@@ -1,0 +1,12 @@
+Flask
+Flask-Cors
+tensorflow
+Pillow
+numpy
+Werkzeug
+google-genai
+python-dotenv
+gunicorn
+unicorn
+websockets
+pydantic

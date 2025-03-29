@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Cancer Classifier</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .upload-container {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        #preview {
+            max-width: 300px;
+            margin: 20px auto;
+            display: none;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Skin Cancer Image Classifier</h1>
+    <div class="upload-container">
+        <h2>Upload Image</h2>
+        <p>Supported formats: PNG, JPG, JPEG</p>
+        <form id="uploadForm">
+            <input type="file" id="imageInput" accept=".png,.jpg,.jpeg" required>
+            <button type="submit">Analyze Image</button>
+        </form>
+    </div>
+    <img id="preview" alt="Image preview">
+    <div id="result"></div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const imageInput = document.getElementById('imageInput');
+        const preview = document.getElementById('preview');
+        const result = document.getElementById('result');
+
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                preview.style.display = 'block';
+                preview.src = URL.createObjectURL(file);
+            }
+        });
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('file', imageInput.files[0]);
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                result.style.display = 'block';
+                if (data.error) {
+                    result.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                } else {
+                    result.innerHTML = `<p>Prediction: ${data.prediction}</p><p>Name: ${data.name}</p><p>Confidence: ${data.confidence}</p>`;
+                }
+            } catch (error) {
+                result.style.display = 'block';
+                result.innerHTML = '<p style="color: red;">Error: Failed to analyze image</p>';
+            }
+        });
+    </script>
+</body>
+</html>

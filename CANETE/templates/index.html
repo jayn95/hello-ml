@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatic Skin Cancer Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .upload-area {
+            border: 2px dashed #3b82f6;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .upload-area:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-color: #2563eb;
+        }
+
+        .example-image {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .example-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .selected-image-container {
+            border: 2px solid #3b82f6;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-top: 1.5rem; 
+            text-align: center;
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        .selected-image-container img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 0.5rem;
+        }
+
+        .results-card {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .error-message {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+        }
+
+        /* Spinner Animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 pb-16"> <!-- Added pb-16 for bottom padding -->
+    <div class="flex flex-col items-center mt-12">
+        <!-- Title -->
+        <h1 class="text-4xl font-bold mb-12">Automatic <span class="text-blue-600">Skin Cancer Detection</span></h1>
+
+        <!-- Main Content Container -->
+        <div class="flex flex-row justify-center w-full max-w-6xl">
+            <!-- Left Column: Upload and Examples (Static) -->
+            <div class="flex flex-col items-center w-1/2">
+                <!-- Upload Box -->
+                <div class="upload-area bg-white w-full" id="uploadArea">
+                    <p class="text-gray-600">Upload a skin image or drag it here.</p>
+                </div>
+
+                <!-- Selected Image Section -->
+                <div id="selectedImageContainer" class="selected-image-container w-full hidden">
+                    <p class="text-gray-600 font-semibold mb-2">Selected Image</p>
+                    <img id="selectedImage" src="" alt="Selected Image" class="mx-auto">
+                </div>
+
+                <!-- Upload Button -->
+                <form id="uploadForm" class="mt-6 w-full" method="POST" enctype="multipart/form-data" action="/predict">
+                    <input type="file" id="fileInput" name="file" accept="image/png, image/jpeg" class="hidden">
+                    <button type="submit" class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        Upload and Analyze
+                    </button>
+                </form>
+
+                <!-- Suggested Images Section -->
+                <div class="mt-8 text-center w-full">
+                    <p class="text-gray-600 mb-4">Try with these example skin images</p>
+                    <div class="flex space-x-4 justify-center">
+                        <button type="button" data-src="{{ url_for('static', filename='images/example1.jpg') }}" data-example="example1.jpg" class="example-image">
+                            <img src="{{ url_for('static', filename='images/example1.jpg') }}" class="w-24 h-24 rounded-lg object-cover">
+                        </button>
+                        <button type="button" data-src="{{ url_for('static', filename='images/example2.jpg') }}" data-example="example2.jpg" class="example-image">
+                            <img src="{{ url_for('static', filename='images/example2.jpg') }}" class="w-24 h-24 rounded-lg object-cover">
+                        </button>
+                        <button type="button" data-src="{{ url_for('static', filename='images/example3.jpg') }}" data-example="example3.jpg" class="example-image">
+                            <img src="{{ url_for('static', filename='images/example3.jpg') }}" class="w-24 h-24 rounded-lg object-cover">
+                        </button>
+                        <button type="button" data-src="{{ url_for('static', filename='images/example4.jpg') }}" data-example="example4.jpg" class="example-image">
+                            <img src="{{ url_for('static', filename='images/example4.jpg') }}" class="w-24 h-24 rounded-lg object-cover">
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Results Card (Reserved Space) -->
+            <div class="w-1/2 pl-8">
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="hidden flex items-center justify-center h-full">
+                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-700"></div>
+                </div>
+
+                <!-- Results Card -->
+                <div id="resultsCard" class="p-6 bg-white rounded-lg shadow-md hidden results-card">
+                    <h2 class="text-xl font-bold mb-4">Prediction Results</h2>
+                    <p><span class="font-semibold">Label:</span> <span id="resultLabel">-</span></p>
+                    <p><span class="font-semibold">Name:</span> <span id="resultName">-</span></p>
+                    <p><span class="font-semibold">Confidence:</span> <span id="resultConfidence">-</span></p>
+                    <!-- Add this new section for description and treatment -->
+                    <div class="mt-4">
+                        <p class="font-semibold">Description and Treatment:</p>
+                        <p id="resultDescriptionAndTreatment" class="text-sm text-gray-600">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="mt-4 text-red-600 font-semibold hidden error-message"></div>
+    </div>
+
+    <!-- JavaScript for Drag-and-Drop, Image Selection, and Results Display -->
+    <script>
+        // Modified JavaScript for handling example images
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadForm = document.getElementById('uploadForm');
+        const selectedImageContainer = document.getElementById('selectedImageContainer');
+        const selectedImage = document.getElementById('selectedImage');
+        const resultsCard = document.getElementById('resultsCard');
+        const resultLabel = document.getElementById('resultLabel');
+        const resultName = document.getElementById('resultName');
+        const resultConfidence = document.getElementById('resultConfidence');
+        const resultDescriptionAndTreatment = document.getElementById('resultDescriptionAndTreatment');
+        const exampleImages = document.querySelectorAll('.example-image');
+        const errorMessage = document.getElementById('errorMessage');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+    
+        let selectedFile = null; // Store the selected file
+        let selectedExample = null; // Store the selected example image name
+    
+        // Handle file upload or drag-and-drop
+        uploadArea.addEventListener('click', () => fileInput.click());
+    
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+        });
+    
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.backgroundColor = '';
+        });
+    
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileInput.files = e.dataTransfer.files;
+            handleFileUpload(fileInput.files[0]);
+        });
+    
+        // Handle file input change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleFileUpload(e.target.files[0]);
+            }
+        });
+    
+        // Handle file upload
+        function handleFileUpload(file) {
+            selectedFile = file; // Store the selected file
+            selectedExample = null; // Clear any selected example
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                selectedImage.src = e.target.result;
+                selectedImageContainer.classList.remove('hidden');
+                resultsCard.classList.add('hidden'); // Clear results card
+                errorMessage.classList.add('hidden'); // Clear error message
+            };
+            reader.readAsDataURL(file);
+        }
+    
+        // Handle example image clicks
+        exampleImages.forEach((image) => {
+            image.addEventListener('click', () => {
+                const imgSrc = image.getAttribute('data-src');
+                const exampleName = image.getAttribute('data-example'); // Get the example name
+                selectedImage.src = imgSrc;
+                selectedImageContainer.classList.remove('hidden');
+                selectedExample = exampleName; // Store the selected example name
+                selectedFile = null; // Clear any selected file
+                resultsCard.classList.add('hidden'); // Clear results card
+                errorMessage.classList.add('hidden'); // Clear error message
+            });
+        });
+    
+        // Handle form submission with improved error handling
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+    
+            if (!selectedFile && !selectedExample) {
+                errorMessage.textContent = 'Please select an image first.';
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+    
+            const formData = new FormData();
+    
+            if (selectedFile) {
+                // If it's a file upload
+                formData.append('file', selectedFile);
+            } else if (selectedExample) {
+                // If it's an example image
+                formData.append('example', selectedExample);
+            }
+    
+            try {
+                // Show the loading spinner
+                loadingSpinner.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+    
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData,
+                });
+    
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Prediction failed');
+                }
+    
+                resultLabel.textContent = result.label;
+                resultName.textContent = result.name;
+                resultConfidence.textContent = (result.confidence * 100).toFixed(2) + '%';
+                resultDescriptionAndTreatment.textContent = result.description_and_treatment;
+    
+                // Show the results card
+                resultsCard.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = error.message || 'An error occurred during prediction.';
+                errorMessage.classList.remove('hidden');
+            } finally {
+                // Hide the loading spinner
+                loadingSpinner.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

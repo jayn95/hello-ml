@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Cancer Classifier</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #F2EFE7;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 70%;
+            margin: auto;
+        }
+        .title-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #397076;
+            margin-bottom: 30px;
+        }
+        .content-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .upload-container, .result-container {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+        }
+        .upload-container {
+            background: rgba(90, 158, 197, 0.2);
+            border: 2px dashed #3D7A99;
+        }
+        .result-container {
+            background: rgba(90, 158, 197, 0.2);
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            background-color: #9ACBD0;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .custom-file-upload:hover {
+            background-color: #7FB3B8;
+        }
+        button {
+            background-color: #9ACBD0;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #7FB3B8;
+        }
+        .result-container img {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .result-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .info-text {
+            margin-top: 10px;
+            color: #555;
+        }
+        .instructions {
+            font-size: 16px;
+            margin-top: 10px;
+            font-weight: normal;
+            color: #666;
+        }
+    </style>
+    <script>
+        function displayFileName(input) {
+            const fileName = input.files.length > 0 ? input.files[0].name : "No file chosen";
+            document.getElementById("file-name").textContent = fileName;
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            {% if image %}
+                document.getElementById("file-name").textContent = "{{ image }}";
+            {% endif %}
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="title-container">Skin Cancer Classifier</div>
+        <div class="content-container">
+            <div class="upload-container">
+                <p class="instructions">Please select a clear image of your skin condition for classification. Only image files are accepted.</p>
+                <form action="/classify" method="post" enctype="multipart/form-data">
+                    <label for="file-upload" class="custom-file-upload">Choose File</label>
+                    <input id="file-upload" type="file" name="file" accept="image/*" required onchange="displayFileName(this)">
+                    <p id="file-name">No file chosen</p>
+                    <br>
+                    <button type="submit">Submit & Classify</button>
+                </form>
+            </div>
+            {% if disease %}
+            <div class="result-container">
+                <h3 class="result-text">Prediction: {{ disease }}</h3>
+                <img src="{{ url_for('uploaded_file', filename=image) }}" alt="Uploaded Image">
+                <p class="info-text">{{ info }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
