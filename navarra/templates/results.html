@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkinVision</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="static/results_design.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <a class="navbar-brand ms-4 text-black" href="#">
+            <i class="fas fa-ribbon"></i> SkinVision
+        </a>
+    </nav>
+    <div class="container">
+        <h1>Prediction Results</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50%;">Label</th>
+                    <th style="width: 50%;">Confidence Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>{{ result.label }}</td>
+                    <td>{{ "%.2f" | format(result.score) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="classification">
+            <p>{{ classification }}</p>
+        </div>
+
+        <div class="disease-info">
+            <h2>Detailed Information</h2>
+            <p>{{ disease_info | replace('\n', '<br>') | safe }}</p>
+        </div>
+
+        <a href="/" class="btn">Upload Another Image</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,133 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background-color: #fafafa;
+}
+/* Navbar */
+.custom-navbar {
+    background-color: #ffffff;
+    font-weight: bold;
+    font-family: 'Poppins', sans-serif;
+}
+.navbar-brand {
+    font-size: 28px; /* Increase the font size */
+    font-weight: bold; /* Optional: Make it bold */
+    color: #000000; /* Optional: Ensure the color is consistent */
+}
+.navbar-brand i {
+    font-size: 35px; /* Adjust size */
+    margin-left: 30px;
+    margin-right: 8px; /* Space between icon and text */
+    margin-top: 7px; /* Align with text */
+    margin-bottom: 7px; /* Align with text */
+    color: #0b4d9d; /* Change color */
+}
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8vw;
+    padding: 30px;
+    max-width: 90vw;
+    width: 90%;
+    max-height: 100vh;
+    margin-top: 30px;
+}
+.left-section {
+    flex: 1;
+    text-align: left;
+    padding-right: 20px;
+}
+.right-section {
+    flex: 1;
+    text-align: center;
+}
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 10vh;
+    margin-left: 50px;
+}
+.left-section p {
+    font-size: 3vh;
+    color: #555;
+    margin-bottom: 20px;
+    margin-left: 50px;
+}
+.upload-box {
+    background: #ffffff;
+    padding: 30px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    border-radius: 8px;
+    margin-top: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    text-align: center;
+    max-height: 30vh;
+}
+/* .upload-box:hover {
+    background: #e2e2e2;
+} */
+.upload-box p {
+    margin: 0;
+    font-size: 1.5vh;
+    color: #555;
+}
+input[type="file"] {
+    display: none;
+}
+.custom-file-upload {
+    background-color: #0481b2; 
+    color: white;
+    border: none;
+    padding: 10px 35px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1em;
+    text-align: center;
+    display: inline-block;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 5px 10px rgba(4, 80, 124, 0.2);
+}
+.custom-file-upload:hover {
+    background-color: #00425c; 
+}
+.file-name {
+    margin-left: 10px;
+    font-size: 1em;
+    color: #555;
+    font-style: italic;
+}
+button {
+    background-color: #f1f3fb;
+    color: black;
+    padding: 10px 60px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 1em;
+}
+button:hover {
+    background-color: #d9dbe2;
+}
+.footer p{
+    margin-left: 50px;
+    margin-top: 20px;
+    font-size: 1.5vh;
+    color: #666;
+}
+.profile-image {
+    max-width: 100%;
+    width: 80vh;
+    height: auto;
+}
