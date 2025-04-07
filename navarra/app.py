@@ -43,7 +43,16 @@ def load_labels_json(label_path):
 def fetch_disease_info(disease_name):
     """
     Generate a detailed description of the disease using Gemini's generative AI model.
+    Fallback to static information if the model fails.
     """
+    # Static fallback information
+    static_info = {
+        "Melanoma": "Melanoma is a type of skin cancer that develops in melanocytes. It is often caused by excessive exposure to ultraviolet (UV) radiation. Early detection and treatment are critical.",
+        "Basal Cell Carcinoma": "Basal Cell Carcinoma is a common type of skin cancer that arises from basal cells. It is usually caused by prolonged sun exposure and is highly treatable.",
+        "Benign Keratosis": "Benign Keratosis is a non-cancerous skin condition that often appears as rough, scaly patches on the skin. It is usually harmless and does not require treatment.",
+        # Add more diseases as needed
+    }
+
     try:
         model = genai.GenerativeModel("gemini-1.5-flash")
         
@@ -55,12 +64,17 @@ def fetch_disease_info(disease_name):
         response = model.generate_content(prompt)
         
         # Ensure response is valid before returning text
-        return response.text if response and hasattr(response, "text") else "No additional information available."
+        if response and hasattr(response, "text"):
+            return response.text
+        else:
+            # Fallback to static information
+            return static_info.get(disease_name, "No additional information available.")
     
     except Exception as e:
         print(f"Error generating disease information: {e}")
-        return "Unable to generate information about the disease at this time."
-
+        # Fallback to static information
+        return static_info.get(disease_name, "Unable to generate information about the disease at this time.")
+    
 @app.route('/')
 def index():
     """Render the homepage with an upload form."""
