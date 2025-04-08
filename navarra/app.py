@@ -98,7 +98,7 @@ def predict():
     file.save(img_path)
 
     # Load the TFLite model and allocate tensors
-    model_path = os.path.join(BASE_DIR, "hello-ml", "navarra", "model", "model.tflite")
+    model_path = os.path.join(BASE_DIR, "model", "model.tflite")
 
     interpreter = tf.lite.Interpreter(model_path=model_path)
     interpreter.allocate_tensors()
