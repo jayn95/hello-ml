@@ -20,7 +20,7 @@ genai.configure(api_key=GEMINI_API_KEY)
 app = Flask(__name__)
 
 # Base directory of the current script
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def load_and_preprocess_image(img_path, input_shape):
     """Load and preprocess an image for the model."""
@@ -98,7 +98,8 @@ def predict():
     file.save(img_path)
 
     # Load the TFLite model and allocate tensors
-    model_path = os.path.join(BASE_DIR, "model", "model.tflite")
+    model_path = r"model\model.tflite"
+
 
     interpreter = tf.lite.Interpreter(model_path=model_path)
     interpreter.allocate_tensors()
