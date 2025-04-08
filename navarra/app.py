@@ -124,8 +124,8 @@ def predict():
         return render_template('error.html', error=f"Error during inference: {e}"), 500
 
     # Load labels from labels.txt and labels.json
-    labels_txt = load_labels("hello-ml/navarra/model/labels.txt")
-    labels_json = load_labels_json("hello-ml/navarra/model/labels.json")
+    labels_txt = load_labels("model/labels.txt")
+    labels_json = load_labels_json("model/labels.json")
 
     # Prepare the predictions
     results = []
